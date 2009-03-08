@@ -17,9 +17,13 @@ my $build = $class->new(
     create_makefile_pl  => 'traditional',
     requires => {
         'perl' => '5.006',
+        'base' => 0,
+        'Devel::Symdump' => 2.08,
+        'Test::Builder::Module' => 0.86, 
     },
     build_requires => {
-        'Test::More' => 0.47,
+        'Carp' => 0,
+        'Test::Builder::Tester' => 1.18, # 1.02 in perl 5.008008; 1.18 is new
     },
     meta_add            => { 
         no_index => { 

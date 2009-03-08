@@ -7,9 +7,44 @@
 package Test::API;
 use strict;
 use warnings;
+use Devel::Symdump ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.001';
 $VERSION = eval $VERSION; ## no critic
+
+use base 'Test::Builder::Module';
+our @EXPORT = qw/public_ok/;
+
+sub public_ok ($;@) { ## no critic
+  my ($package, @expected) = @_;
+  my $tb = __PACKAGE__->builder;
+  my @fcns = _public_fcns($package);
+  my ($missing, $extra) = _difference( \@expected, \@fcns );
+  my $ok = $tb->ok(!@$missing && !@$extra, "public API for $package");
+  if ( !$ok ) {
+    $tb->diag( "missing: @$missing" ) if @$missing;
+    $tb->diag( "extra: @$extra" ) if @$extra;
+  }
+  return $ok;
+}
+
+sub _difference {
+  my ($array1, $array2) = @_;
+  my (%only1, %only2);
+  @only1{ @$array1 } = (1) x @$array1;
+  delete @only1{ @$array2 };
+  @only2{ @$array2 } = (1) x @$array2;
+  delete @only2{ @$array1 };
+  return ([keys %only1], [keys %only2]);
+}
+
+sub _public_fcns {
+  my ($package) = @_;
+  my $symbols = Devel::Symdump->new( $package );
+  return  grep  { substr($_,0,1) ne '_' } 
+          map   { (my $f = $_) =~ s/^$package\:://; $f } 
+          $symbols->functions;
+}
 
 1;
 
@@ -19,7 +54,7 @@ __END__
 
 = NAME
 
-Test::API - Add abstract here
+Test::API - Test a list of subroutines provided by a module
 
 = VERSION
 
@@ -27,13 +62,32 @@ This documentation describes version %%VERSION%%.
 
 = SYNOPSIS
 
+    use Test::More tests => 2;
     use Test::API;
+
+    require_ok( 'My::Package' );
+    public_ok ( 'My::Package', @names );
 
 = DESCRIPTION
 
+This simple test module checks the subroutines provided by a module.  This is
+useful for confirming a planned API in testing and ensuring that other
+functions aren't unintentionally included via import.
 
 = USAGE
 
+== public_ok
+
+  public_ok( $package, @names );
+
+This function checks that all of the {@names} provided are available within the
+{$package} namespace and that *only* these subroutines are available.  This
+means that subroutines imported from other modules will cause this test to fail
+unless they are explicitly included in {@names}.
+
+Subroutines in {$package} starting with an underscore are excluded from 
+consideration.  Therefore, do not include subroutines with an underscore in 
+{@names}.
 
 = BUGS
 
@@ -45,6 +99,7 @@ existing test-file that illustrates the bug or desired feature.
 
 = SEE ALSO
 
+* [Test::ClassAPI] -- more geared towards class trees with inheritance
 
 = AUTHOR
 
