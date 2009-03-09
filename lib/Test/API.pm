@@ -10,7 +10,7 @@ use warnings;
 use Devel::Symdump ();
 use Symbol ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 $VERSION = eval $VERSION; ## no critic
 
 use base 'Test::Builder::Module';

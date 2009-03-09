@@ -7,5 +7,10 @@
 
 Revision history for Test-API
 
+0.002 Mon Mar  9 18:30:20 EDT 2009
+
+  Added:
+  - import_ok() function
+
 0.001 Sun Mar  8 16:38:11 EDT 2009
     - Initial release

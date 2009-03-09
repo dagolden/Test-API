@@ -2,7 +2,7 @@ NAME
     Test::API - Test a list of subroutines provided by a module
 
 VERSION
-    This documentation describes version 0.001.
+    This documentation describes version 0.002.
 
 SYNOPSIS
          use Test::More tests => 2;

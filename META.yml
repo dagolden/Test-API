@@ -1,6 +1,6 @@
 ---
 name: Test-API
-version: 0.001
+version: 0.002
 author:
   - 'David Golden <dagolden@cpan.org>'
 abstract: Test a list of subroutines provided by a module
@@ -19,7 +19,7 @@ build_requires:
 provides:
   Test::API:
     file: lib/Test/API.pm
-    version: 0.001
+    version: 0.002
 generated_by: Module::Build version 0.32
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
