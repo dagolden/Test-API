@@ -18,7 +18,7 @@ our @EXPORT = qw/public_ok import_ok/;
 
 #--------------------------------------------------------------------------#
 
-sub import_ok ($;@) {
+sub import_ok ($;@) { ## no critic
   my $package = shift;
   my %spec = @_;
   for my $key ( qw/export export_ok/ ) {
