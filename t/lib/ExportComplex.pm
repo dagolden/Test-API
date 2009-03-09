@@ -15,5 +15,7 @@ sub baz { 3 }
 
 sub bam { 4 }
 
+sub bamboozle { 99 } # not exported at all
+
 1;
 
