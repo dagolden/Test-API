@@ -14,12 +14,18 @@ use Test::More;
 use Test::Builder::Tester;
 use Test::API;
 
-plan tests => 10;
+plan tests => 11;
 
 require_ok('t::lib::NoSubs');
 require_ok('t::lib::SubFoo');
 require_ok('t::lib::UseCarp');
 require_ok('t::lib::PvtFoo');
+
+test_out("not ok 1 - public API for t::lib::NonExisting");
+test_fail(+2);
+test_diag("Module 't::lib::NonExisting' not loaded");
+public_ok('t::lib::NonExisting');
+test_test('public_ok - module not loaded');
 
 test_out("ok 1 - public API for t::lib::NoSubs");
 public_ok('t::lib::NoSubs');
@@ -43,7 +49,7 @@ test_test('public_ok - one provided, one expected');
 
 test_out("not ok 1 - public API for t::lib::UseCarp");
 test_fail(+2);
-test_diag("missing: foo", "extra: carp croak confess");
+test_diag("missing: foo", "extra: carp confess croak");
 public_ok('t::lib::UseCarp', 'foo');
 test_test('public_ok - use Carp + missing sub');
 

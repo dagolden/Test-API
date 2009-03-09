@@ -4,6 +4,15 @@
 # A copy of the License was distributed with this file or you may obtain a 
 # copy of the License from http://www.apache.org/licenses/LICENSE-2.0
 
-- Write some code
-- Write some tests
-- Replace boilerplate docs with real documentation
+Soon:
+
+- check for export_ok
+
+- check for export_tags
+
+Later:
+
+- add unimport_ok -- but how to specify what we expect
+
+- custom import behaviors via a code ref to run (given package name)
+
