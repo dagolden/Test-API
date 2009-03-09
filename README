@@ -5,7 +5,7 @@ VERSION
     This documentation describes version 0.002.
 
 SYNOPSIS
-         use Test::More tests => 2;
+         use Test::More tests => 3;
          use Test::API;
      
      require_ok( 'My::Package' );
@@ -39,7 +39,7 @@ USAGE
 
     This function checks that $package correctly exports an expected list of
     subroutines and only these subroutines. The %spec generally follows the
-    style used by Exporter, bun in lower case:
+    style used by Exporter, but in lower case:
 
        %spec = (
          export    => [ 'foo', 'bar' ],  # exported automatically

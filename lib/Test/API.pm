@@ -160,7 +160,7 @@ This documentation describes version %%VERSION%%.
 
 = SYNOPSIS
 
-    use Test::More tests => 2;
+    use Test::More tests => 3;
     use Test::API;
 
     require_ok( 'My::Package' );
@@ -198,7 +198,7 @@ unless they are explicitly included in {@names}.
   
 This function checks that {$package} correctly exports an expected list of
 subroutines and *only* these subroutines.  The {%spec} generally follows 
-the style used by [Exporter], bun in lower case:  
+the style used by [Exporter], but in lower case:  
 
   %spec = (
     export    => [ 'foo', 'bar' ],  # exported automatically

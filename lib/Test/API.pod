@@ -12,7 +12,7 @@ This documentation describes version 0.002.
 
 =head1 SYNOPSIS
 
-     use Test::More tests => 2;
+     use Test::More tests => 3;
      use Test::API;
  
      require_ok( 'My::Package' );
@@ -50,7 +50,7 @@ unless they are explicitly included in C<<< @names >>>.
 
 This function checks that C<<< $package >>> correctly exports an expected list of
 subroutines and B<only> these subroutines.  The C<<< %spec >>> generally follows 
-the style used by L<Exporter>, bun in lower case:  
+the style used by L<Exporter>, but in lower case:  
 
    %spec = (
      export    => [ 'foo', 'bar' ],  # exported automatically
