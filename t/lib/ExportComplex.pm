@@ -4,11 +4,16 @@ use warnings;
 
 use base 'Exporter';
 
-our @EXPORT = qw/foo bar/;
+our @EXPORT     = qw/foo bar/;
+our @EXPORT_OK  = qw/baz bam/;
 
 sub foo { 1 }
 
 sub bar { 2 }
+
+sub baz { 3 }
+
+sub bam { 4 }
 
 1;
 

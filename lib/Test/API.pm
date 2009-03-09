@@ -21,8 +21,10 @@ our @EXPORT = qw/public_ok import_ok/;
 sub import_ok ($;@) {
   my $package = shift;
   my %spec = @_;
-  $spec{export} ||= [];
-  $spec{export} = [ $spec{export} ] unless ref $spec{export} eq 'ARRAY';
+  for my $key ( qw/export export_ok/ ) {
+    $spec{$key} ||= [];
+    $spec{$key} = [ $spec{$key} ] unless ref $spec{$key} eq 'ARRAY';
+  }
   my $tb = _builder();
   my @errors;
 
@@ -30,13 +32,36 @@ sub import_ok ($;@) {
 
   return 0 unless _check_loaded($package, $label);
 
-  # test EXPORT
-  my $test_pkg = *{Symbol::gensym()}{NAME};
-  eval "package $test_pkg; use $package;"; ## no critic
-  my ($ok, $missing, $extra ) = _public_ok( $test_pkg, @{$spec{export}} );
-  if ( !$ok ) {
-    push @errors, "not exported: @$missing" if @$missing;
-    push @errors, "unexpectedly exported: @$extra" if @$extra;
+  # test export
+  {
+    my $test_pkg = *{Symbol::gensym()}{NAME};
+    eval "package $test_pkg; use $package;"; ## no critic
+    my ($ok, $missing, $extra ) = _public_ok( $test_pkg, @{$spec{export}} );
+    if ( !$ok ) {
+      push @errors, "not exported: @$missing" if @$missing;
+      push @errors, "unexpectedly exported: @$extra" if @$extra;
+    }
+  }
+
+  # test export_ok
+  for my $opt_fcn ( @{$spec{export_ok}} ) {
+    my $pkg_name = *{Symbol::gensym()}{NAME};
+    eval "package $pkg_name; use $package '$opt_fcn';"; ## no critic
+    my ($ok, $missing, $extra ) = _public_ok( $pkg_name, $opt_fcn );
+    if ( !$ok ) {
+      push @errors, "not optionally exported: $opt_fcn" if @$missing;
+    }
+  }
+
+  # check export_ok vs @EXPORT_OK
+  my (@export_ok) = (eval "\@$package\::EXPORT_OK");
+  if ( @export_ok ) {
+    my ($missing, $extra) = _difference( 
+      $spec{export_ok}, \@export_ok,
+    );
+    if ( @$extra ) {
+      push @errors, "extra optionally exported: @$extra";
+    }
   }
 
   # notify of results
