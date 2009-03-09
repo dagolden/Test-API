@@ -27,6 +27,7 @@ sub import_ok ($;@) {
   }
   my $tb = _builder();
   my @errors;
+  my %flagged;
 
   my $label = "importing from $package";
 
@@ -39,30 +40,29 @@ sub import_ok ($;@) {
     my ($ok, $missing, $extra ) = _public_ok( $test_pkg, @{$spec{export}} );
     if ( !$ok ) {
       push @errors, "not exported: @$missing" if @$missing;
+      @flagged{ @$missing } = (1) x @$missing if @$missing;
       push @errors, "unexpectedly exported: @$extra" if @$extra;
+      @flagged{ @$extra } = (1) x @$extra if @$extra;
     }
   }
 
   # test export_ok
-  for my $opt_fcn ( @{$spec{export_ok}} ) {
+  my @exportable;
+  for my $fcn ( _public_fcns( $package ) ) {
+    next if $flagged{$fcn}; # already complaining about this so skip
+    next if grep { $fcn eq $_ } @{$spec{export}}; # exported by default
     my $pkg_name = *{Symbol::gensym()}{NAME};
-    eval "package $pkg_name; use $package '$opt_fcn';"; ## no critic
-    my ($ok, $missing, $extra ) = _public_ok( $pkg_name, $opt_fcn );
-    if ( !$ok ) {
-      push @errors, "not optionally exported: $opt_fcn" if @$missing;
+    eval "package $pkg_name; use $package '$fcn';"; ## no critic
+    my ($ok, $missing, $extra ) = _public_ok( $pkg_name, $fcn );
+    if ( $ok ) {
+      push @exportable, $fcn;
     }
   }
-
-  # check export_ok vs @EXPORT_OK
-  my (@export_ok) = (eval "\@$package\::EXPORT_OK");
-  if ( @export_ok ) {
-    my ($missing, $extra) = _difference( 
-      $spec{export_ok}, \@export_ok,
-    );
-    if ( @$extra ) {
-      push @errors, "extra optionally exported: @$extra";
-    }
-  }
+  my ($missing, $extra) = _difference( 
+    $spec{export_ok}, \@exportable,
+  );
+  push @errors, "not optionally exportable: @$missing" if @$missing;
+  push @errors, "extra optionally exportable: @$extra" if @$extra;
 
   # notify of results
   $tb->ok(! @errors, "importing from $package");
@@ -168,7 +168,8 @@ This documentation describes version %%VERSION%%.
     public_ok ( 'My::Package', @names );
     
     import_ok ( 'My::Package',
-        export => [ 'foo', 'bar' ],
+        export    => [ 'foo', 'bar' ],
+        export_ok => [ 'baz', 'bam' ], 
     );
 
 = DESCRIPTION
@@ -193,7 +194,7 @@ unless they are explicitly included in {@names}.
 
 == import_ok
 
-    import_ok ( $package, %spec );
+  import_ok ( $package, %spec );
   
 This function checks that {$package} correctly exports an expected list of
 subroutines and *only* these subroutines.  The {%spec} generally follows 
@@ -203,6 +204,9 @@ the style used by [Exporter], bun in lower case:
     export    => [ 'foo', 'bar' ],  # exported automatically
     export_ok => [ 'baz', 'bam' ],  # optional exports
   );
+
+For {export_ok}, the test will check for public functions not listed in
+{export} or {export_ok} that can be imported and will fail if any are found.
 
 = BUGS
 

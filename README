@@ -9,7 +9,13 @@ SYNOPSIS
          use Test::API;
      
      require_ok( 'My::Package' );
-         public_ok ( 'My::Package', @names );
+     
+     public_ok ( 'My::Package', @names );
+     
+     import_ok ( 'My::Package',
+             export    => [ 'foo', 'bar' ],
+             export_ok => [ 'baz', 'bam' ], 
+         );
 
 DESCRIPTION
     This simple test module checks the subroutines provided by a module.
@@ -17,6 +23,9 @@ DESCRIPTION
     other functions aren't unintentionally included via import.
 
 USAGE
+    Note: Subroutines in a package starting with an underscore are ignored.
+    Therefore, do not include them in any list of expected subroutines.
+
   public_ok
        public_ok( $package, @names );
 
@@ -25,9 +34,21 @@ USAGE
     available. This means that subroutines imported from other modules will
     cause this test to fail unless they are explicitly included in @names.
 
-    Subroutines in $package starting with an underscore are excluded from
-    consideration. Therefore, do not include subroutines with an underscore
-    in @names.
+  import_ok
+       import_ok ( $package, %spec );
+
+    This function checks that $package correctly exports an expected list of
+    subroutines and only these subroutines. The %spec generally follows the
+    style used by Exporter, bun in lower case:
+
+       %spec = (
+         export    => [ 'foo', 'bar' ],  # exported automatically
+         export_ok => [ 'baz', 'bam' ],  # optional exports
+       );
+
+    For "export_ok", the test will check for public functions not listed in
+    "export" or "export_ok" that can be imported and will fail if any are
+    found.
 
 BUGS
     Please report any bugs or feature requests using the CPAN Request

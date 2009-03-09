@@ -96,7 +96,7 @@ test_test('import_ok - export_ok several functions');
 
 test_out("not ok 1 - importing from t::lib::ExportComplex");
 test_fail(+2);
-test_diag("not optionally exported: wibble");
+test_diag("not optionally exportable: wibble");
 import_ok('t::lib::ExportComplex', 
   export => [qw/foo bar/], export_ok => [qw/wibble baz bam/] 
 );
@@ -104,7 +104,7 @@ test_test('import_ok - export_ok a missing function');
 
 test_out("not ok 1 - importing from t::lib::ExportComplex");
 test_fail(+2);
-test_diag("extra optionally exported: bam baz");
+test_diag("extra optionally exportable: bam baz");
 import_ok('t::lib::ExportComplex', 
   export => [qw/foo bar/], 
 );

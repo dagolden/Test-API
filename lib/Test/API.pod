@@ -16,7 +16,13 @@ This documentation describes version 0.001.
      use Test::API;
  
      require_ok( 'My::Package' );
+ 
      public_ok ( 'My::Package', @names );
+ 
+     import_ok ( 'My::Package',
+         export    => [ 'foo', 'bar' ],
+         export_ok => [ 'baz', 'bam' ], 
+     );
 
 =head1 DESCRIPTION
 
@@ -25,6 +31,9 @@ useful for confirming a planned API in testing and ensuring that other
 functions aren't unintentionally included via import.
 
 =head1 USAGE
+
+Note: Subroutines in a package starting with an underscore are ignored.
+Therefore, do not include them in any list of expected subroutines.
 
 =head2 public_ok
 
@@ -35,9 +44,21 @@ C<<< $package >>> namespace and that B<only> these subroutines are available.  T
 means that subroutines imported from other modules will cause this test to fail
 unless they are explicitly included in C<<< @names >>>.
 
-Subroutines in C<<< $package >>> starting with an underscore are excluded from 
-consideration.  Therefore, do not include subroutines with an underscore in 
-C<<< @names >>>.
+=head2 import_ok
+
+   import_ok ( $package, %spec );
+
+This function checks that C<<< $package >>> correctly exports an expected list of
+subroutines and B<only> these subroutines.  The C<<< %spec >>> generally follows 
+the style used by L<Exporter>, bun in lower case:  
+
+   %spec = (
+     export    => [ 'foo', 'bar' ],  # exported automatically
+     export_ok => [ 'baz', 'bam' ],  # optional exports
+   );
+
+For C<<< export_ok >>>, the test will check for public functions not listed in
+C<<< export >>> or C<<< export_ok >>> that can be imported and will fail if any are found.
 
 =head1 BUGS
 
