@@ -15,129 +15,125 @@ our @EXPORT = qw/public_ok import_ok/;
 #--------------------------------------------------------------------------#
 
 sub import_ok ($;@) { ## no critic
-  my $package = shift;
-  my %spec = @_;
-  for my $key ( qw/export export_ok/ ) {
-    $spec{$key} ||= [];
-    $spec{$key} = [ $spec{$key} ] unless ref $spec{$key} eq 'ARRAY';
-  }
-  my $tb = _builder();
-  my @errors;
-  my %flagged;
-
-  my $label = "importing from $package";
-
-  return 0 unless _check_loaded($package, $label);
-
-  # test export
-  {
-    my $test_pkg = *{Symbol::gensym()}{NAME};
-    eval "package $test_pkg; use $package;"; ## no critic
-    my ($ok, $missing, $extra ) = _public_ok( $test_pkg, @{$spec{export}} );
-    if ( !$ok ) {
-      push @errors, "not exported: @$missing" if @$missing;
-      @flagged{ @$missing } = (1) x @$missing if @$missing;
-      push @errors, "unexpectedly exported: @$extra" if @$extra;
-      @flagged{ @$extra } = (1) x @$extra if @$extra;
+    my $package = shift;
+    my %spec    = @_;
+    for my $key (qw/export export_ok/) {
+        $spec{$key} ||= [];
+        $spec{$key} = [ $spec{$key} ] unless ref $spec{$key} eq 'ARRAY';
     }
-  }
+    my $tb = _builder();
+    my @errors;
+    my %flagged;
 
-  # test export_ok
-  my @exportable;
-  for my $fcn ( _public_fcns( $package ) ) {
-    next if $flagged{$fcn}; # already complaining about this so skip
-    next if grep { $fcn eq $_ } @{$spec{export}}; # exported by default
-    my $pkg_name = *{Symbol::gensym()}{NAME};
-    eval "package $pkg_name; use $package '$fcn';"; ## no critic
-    my ($ok, $missing, $extra ) = _public_ok( $pkg_name, $fcn );
-    if ( $ok ) {
-      push @exportable, $fcn;
+    my $label = "importing from $package";
+
+    return 0 unless _check_loaded( $package, $label );
+
+    # test export
+    {
+        my $test_pkg = *{ Symbol::gensym() }{NAME};
+        eval "package $test_pkg; use $package;"; ## no critic
+        my ( $ok, $missing, $extra ) = _public_ok( $test_pkg, @{ $spec{export} } );
+        if ( !$ok ) {
+            push @errors, "not exported: @$missing" if @$missing;
+            @flagged{@$missing} = (1) x @$missing if @$missing;
+            push @errors, "unexpectedly exported: @$extra" if @$extra;
+            @flagged{@$extra} = (1) x @$extra if @$extra;
+        }
     }
-  }
-  my ($missing, $extra) = _difference( 
-    $spec{export_ok}, \@exportable,
-  );
-  push @errors, "not optionally exportable: @$missing" if @$missing;
-  push @errors, "extra optionally exportable: @$extra" if @$extra;
 
-  # notify of results
-  $tb->ok(! @errors, "importing from $package");
-  $tb->diag( $_ ) for @errors;
-  return ! @errors;
+    # test export_ok
+    my @exportable;
+    for my $fcn ( _public_fcns($package) ) {
+        next if $flagged{$fcn}; # already complaining about this so skip
+        next if grep { $fcn eq $_ } @{ $spec{export} }; # exported by default
+        my $pkg_name = *{ Symbol::gensym() }{NAME};
+        eval "package $pkg_name; use $package '$fcn';"; ## no critic
+        my ( $ok, $missing, $extra ) = _public_ok( $pkg_name, $fcn );
+        if ($ok) {
+            push @exportable, $fcn;
+        }
+    }
+    my ( $missing, $extra ) = _difference( $spec{export_ok}, \@exportable, );
+    push @errors, "not optionally exportable: @$missing" if @$missing;
+    push @errors, "extra optionally exportable: @$extra" if @$extra;
+
+    # notify of results
+    $tb->ok( !@errors, "importing from $package" );
+    $tb->diag($_) for @errors;
+    return !@errors;
 }
 
-#--------------------------------------------------------------------------# 
+#--------------------------------------------------------------------------#
 
 sub public_ok ($;@) { ## no critic
-  my ($package, @expected) = @_;
-  my $tb = _builder();
-  my $label = "public API for $package";
+    my ( $package, @expected ) = @_;
+    my $tb    = _builder();
+    my $label = "public API for $package";
 
-  return 0 unless _check_loaded($package, $label);
+    return 0 unless _check_loaded( $package, $label );
 
-  my ($ok, $missing, $extra) = _public_ok( $package, @expected );
-  $tb->ok($ok, $label );
-  if ( !$ok ) {
-    $tb->diag( "missing: @$missing" ) if @$missing;
-    $tb->diag( "extra: @$extra" ) if @$extra;
-  }
-  return $ok;
+    my ( $ok, $missing, $extra ) = _public_ok( $package, @expected );
+    $tb->ok( $ok, $label );
+    if ( !$ok ) {
+        $tb->diag("missing: @$missing") if @$missing;
+        $tb->diag("extra: @$extra")     if @$extra;
+    }
+    return $ok;
 }
 
 #--------------------------------------------------------------------------#
 
 sub _builder {
-  return __PACKAGE__->builder;
+    return __PACKAGE__->builder;
 }
 
 #--------------------------------------------------------------------------#
 
 sub _check_loaded {
-  my ($package, $label) = @_;
-  (my $path = $package) =~ s{::}{/}g;
-  $path .= ".pm";
-  if ( $INC{$path} ) {
-    return 1
-  }
-  else {
-    my $tb = _builder();
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-    $tb->ok( 0, $label );
-    $tb->diag( "Module '$package' not loaded" );
-    return;
-  }
+    my ( $package, $label ) = @_;
+    ( my $path = $package ) =~ s{::}{/}g;
+    $path .= ".pm";
+    if ( $INC{$path} ) {
+        return 1;
+    }
+    else {
+        my $tb = _builder();
+        local $Test::Builder::Level = $Test::Builder::Level + 1;
+        $tb->ok( 0, $label );
+        $tb->diag("Module '$package' not loaded");
+        return;
+    }
 }
 
 #--------------------------------------------------------------------------#
 
 sub _difference {
-  my ($array1, $array2) = @_;
-  my (%only1, %only2);
-  @only1{ @$array1 } = (1) x @$array1;
-  delete @only1{ @$array2 };
-  @only2{ @$array2 } = (1) x @$array2;
-  delete @only2{ @$array1 };
-  return ([sort keys %only1], [sort keys %only2]);
+    my ( $array1, $array2 ) = @_;
+    my ( %only1, %only2 );
+    @only1{@$array1} = (1) x @$array1;
+    delete @only1{@$array2};
+    @only2{@$array2} = (1) x @$array2;
+    delete @only2{@$array1};
+    return ( [ sort keys %only1 ], [ sort keys %only2 ] );
 }
-
 
 #--------------------------------------------------------------------------#
 
 sub _public_fcns {
-  my ($package) = @_;
-  my $symbols = Devel::Symdump->new( $package );
-  return  grep  { substr($_,0,1) ne '_' } 
-          map   { (my $f = $_) =~ s/^$package\:://; $f } 
-          $symbols->functions;
+    my ($package) = @_;
+    my $symbols = Devel::Symdump->new($package);
+    return grep { substr( $_, 0, 1 ) ne '_' }
+      map { ( my $f = $_ ) =~ s/^$package\:://; $f } $symbols->functions;
 }
 
 #--------------------------------------------------------------------------#
 
 sub _public_ok ($;@) { ## no critic
-  my ($package, @expected) = @_;
-  my @fcns = _public_fcns($package);
-  my ($missing, $extra) = _difference( \@expected, \@fcns );
-  return ( !@$missing && !@$extra, $missing, $extra );
+    my ( $package, @expected ) = @_;
+    my @fcns = _public_fcns($package);
+    my ( $missing, $extra ) = _difference( \@expected, \@fcns );
+    return ( !@$missing && !@$extra, $missing, $extra );
 }
 
 1;
