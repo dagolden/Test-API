@@ -8,6 +8,7 @@ requires "warnings" => "0";
 
 on 'test' => sub {
   requires "Carp" => "0";
+  requires "Exporter" => "0";
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec::Functions" => "0";
   requires "List::Util" => "0";
