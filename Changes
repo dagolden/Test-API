@@ -1,16 +1,19 @@
-# Changes
-# Copyright (c) 2009 by David Golden. All rights reserved.
-# Licensed under Apache License, Version 2.0 (the "License").
-# You may not use this file except in compliance with the License.
-# A copy of the License was distributed with this file or you may obtain a 
-# copy of the License from http://www.apache.org/licenses/LICENSE-2.0
-
 Revision history for Test-API
+
+{{$NEXT}}
+
+    [CHANGED]
+
+    - updated distribution metadata, repo and bugtracker
+
+    - switched to Dist::Zilla for managing this distribution
 
 0.002 Mon Mar  9 18:30:20 EDT 2009
 
-  Added:
-  - import_ok() function
+    [ADDED]
+
+    - import_ok() function
 
 0.001 Sun Mar  8 16:38:11 EDT 2009
+
     - Initial release

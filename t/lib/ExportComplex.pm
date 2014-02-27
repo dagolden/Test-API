@@ -2,10 +2,10 @@ package t::lib::ExportComplex;
 use strict;
 use warnings;
 
-use base 'Exporter';
-
-our @EXPORT     = qw/foo bar/;
-our @EXPORT_OK  = qw/baz bam/;
+use Exporter;
+our @ISA       = qw/Exporter/;
+our @EXPORT    = qw/foo bar/;
+our @EXPORT_OK = qw/baz bam/;
 
 sub foo { 1 }
 

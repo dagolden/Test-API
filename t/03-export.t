@@ -11,7 +11,7 @@ select STDERR; $|++;
 select STDOUT; $|++; 
 
 use Test::More;
-use Test::Builder::Tester;
+use Test::Builder::Tester 1.18;
 use Test::API;
 
 plan tests => 14;

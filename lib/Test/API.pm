@@ -1,19 +1,15 @@
-# Copyright (c) 2009 by David Golden. All rights reserved.
-# Licensed under Apache License, Version 2.0 (the "License").
-# You may not use this file except in compliance with the License.
-# A copy of the License was distributed with this file or you may obtain a 
-# copy of the License from http://www.apache.org/licenses/LICENSE-2.0
-
-package Test::API;
+use 5.006;
 use strict;
 use warnings;
-use Devel::Symdump ();
+
+package Test::API;
+# ABSTRACT: Test a list of subroutines provided by a module
+# VERSION
+
+use Devel::Symdump 2.08 ();
 use Symbol ();
 
-our $VERSION = '0.002';
-$VERSION = eval $VERSION; ## no critic
-
-use base 'Test::Builder::Module';
+use superclass 'Test::Builder::Module' => 0.86;
 our @EXPORT = qw/public_ok import_ok/;
 
 #--------------------------------------------------------------------------#
@@ -148,17 +144,7 @@ sub _public_ok ($;@) { ## no critic
 
 __END__
 
-=begin wikidoc
-
-= NAME
-
-Test::API - Test a list of subroutines provided by a module
-
-= VERSION
-
-This documentation describes version %%VERSION%%.
-
-= SYNOPSIS
+=head1 SYNOPSIS
 
     use Test::More tests => 3;
     use Test::API;
@@ -172,32 +158,32 @@ This documentation describes version %%VERSION%%.
         export_ok => [ 'baz', 'bam' ], 
     );
 
-= DESCRIPTION
+=head1 DESCRIPTION
 
 This simple test module checks the subroutines provided by a module.  This is
 useful for confirming a planned API in testing and ensuring that other
 functions aren't unintentionally included via import.
 
-= USAGE
+=head1 USAGE
 
 Note: Subroutines in a package starting with an underscore are ignored.
 Therefore, do not include them in any list of expected subroutines.
 
-== public_ok
+=head2 public_ok
 
   public_ok( $package, @names );
 
-This function checks that all of the {@names} provided are available within the
-{$package} namespace and that *only* these subroutines are available.  This
+This function checks that all of the C<@names> provided are available within the
+C<$package> namespace and that *only* these subroutines are available.  This
 means that subroutines imported from other modules will cause this test to fail
-unless they are explicitly included in {@names}.
+unless they are explicitly included in C<@names>.
 
-== import_ok
+=head2 import_ok
 
   import_ok ( $package, %spec );
   
-This function checks that {$package} correctly exports an expected list of
-subroutines and *only* these subroutines.  The {%spec} generally follows 
+This function checks that C<$package> correctly exports an expected list of
+subroutines and *only* these subroutines.  The C<%spec> generally follows 
 the style used by [Exporter], but in lower case:  
 
   %spec = (
@@ -205,45 +191,13 @@ the style used by [Exporter], but in lower case:
     export_ok => [ 'baz', 'bam' ],  # optional exports
   );
 
-For {export_ok}, the test will check for public functions not listed in
-{export} or {export_ok} that can be imported and will fail if any are found.
+For C<export_ok>, the test will check for public functions not listed in
+C<export> or C<export_ok> that can be imported and will fail if any are found.
 
-= BUGS
+=head1 SEE ALSO
 
-Please report any bugs or feature requests using the CPAN Request Tracker  
-web interface at [http://rt.cpan.org/Dist/Display.html?Queue=Test-API]
-
-When submitting a bug or request, please include a test-file or a patch to an
-existing test-file that illustrates the bug or desired feature.
-
-= SEE ALSO
-
-* [Test::ClassAPI] -- more geared towards class trees with inheritance
-
-= AUTHOR
-
-David A. Golden (DAGOLDEN)
-
-= COPYRIGHT AND LICENSE
-
-Copyright (c) 2009 by David A. Golden. All rights reserved.
-
-Licensed under Apache License, Version 2.0 (the "License").
-You may not use this file except in compliance with the License.
-A copy of the License was distributed with this file or you may obtain a 
-copy of the License from http://www.apache.org/licenses/LICENSE-2.0
-
-Files produced as output though the use of this software, shall not be
-considered Derivative Works, but shall be considered the original work of the
-Licensor.
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-=end wikidoc
+=for :list
+* L<Test::ClassAPI> -- more geared towards class trees with inheritance
 
 =cut
 
