@@ -9,7 +9,8 @@ package Test::API;
 use Devel::Symdump 2.08 ();
 use Symbol ();
 
-use superclass 'Test::Builder::Module' => 0.86;
+use Test::Builder::Module 0.86;
+our @ISA    = qw/Test::Builder::Module/;
 our @EXPORT = qw/public_ok import_ok/;
 
 #--------------------------------------------------------------------------#
