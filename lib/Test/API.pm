@@ -6,7 +6,6 @@ package Test::API;
 # ABSTRACT: Test a list of subroutines provided by a module
 # VERSION
 
-use Devel::Symdump 2.08 ();
 use Symbol ();
 
 use superclass 'Test::Builder::Module' => 0.86;
@@ -148,9 +147,11 @@ sub _difference {
 
 sub _public_fcns {
     my ($package) = @_;
-    my $symbols = Devel::Symdump->new($package);
+    no strict qw(refs);
     return grep { substr( $_, 0, 1 ) ne '_' }
-      map { ( my $f = $_ ) =~ s/^$package\:://; $f } $symbols->functions;
+      map { ( my $f = $_ ) =~ s/^\*$package\:://; $f }
+      grep { defined(*$_{CODE}) }
+      values(%{"$package\::"});
 }
 
 #--------------------------------------------------------------------------#
