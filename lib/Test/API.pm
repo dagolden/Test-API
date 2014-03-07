@@ -10,7 +10,7 @@ use Devel::Symdump 2.08 ();
 use Symbol ();
 
 use superclass 'Test::Builder::Module' => 0.86;
-our @EXPORT = qw/public_ok import_ok/;
+our @EXPORT = qw/public_ok import_ok class_api_ok/;
 
 #--------------------------------------------------------------------------#
 
@@ -84,6 +84,32 @@ sub public_ok ($;@) { ## no critic
 
 #--------------------------------------------------------------------------#
 
+sub class_api_ok ($;@) { ## no critic
+    my ( $package, @expected ) = @_;
+    my $tb    = _builder();
+    my $label = "public API for class $package";
+
+    return 0 unless _check_loaded( $package, $label );
+
+    my ( $ok, $missing, $extra ) = _public_ok( $package, @expected );
+
+    # Call ->can to check if missing methods might be provided
+    # by parent classes...
+    if ( !$ok ) {
+        @$missing = grep { not $package->can($_) } @$missing;
+        $ok = not( scalar(@$missing) + scalar(@$extra) );
+    }
+
+    $tb->ok( $ok, $label );
+    if ( !$ok ) {
+        $tb->diag("missing: @$missing") if @$missing;
+        $tb->diag("extra: @$extra")     if @$extra;
+    }
+    return $ok;
+}
+
+#--------------------------------------------------------------------------#
+
 sub _builder {
     return __PACKAGE__->builder;
 }
@@ -146,13 +172,15 @@ __END__
     use Test::API;
 
     require_ok( 'My::Package' );
-    
+
     public_ok ( 'My::Package', @names );
-    
+
     import_ok ( 'My::Package',
         export    => [ 'foo', 'bar' ],
-        export_ok => [ 'baz', 'bam' ], 
+        export_ok => [ 'baz', 'bam' ],
     );
+
+    class_api_ok( 'My::Class', @methods );
 
 =head1 DESCRIPTION
 
@@ -174,13 +202,21 @@ C<$package> namespace and that *only* these subroutines are available.  This
 means that subroutines imported from other modules will cause this test to fail
 unless they are explicitly included in C<@names>.
 
+=head2 class_api_ok
+
+  class_api_ok( $class, @names );
+
+A variation of C<public_ok> for object-oriented modules. Allows superclasses
+to fill in "missing" subroutines, but "extra" methods provided by superclasses
+will not cause the test to fail.
+
 =head2 import_ok
 
   import_ok ( $package, %spec );
-  
+
 This function checks that C<$package> correctly exports an expected list of
-subroutines and *only* these subroutines.  The C<%spec> generally follows 
-the style used by [Exporter], but in lower case:  
+subroutines and *only* these subroutines.  The C<%spec> generally follows
+the style used by [Exporter], but in lower case:
 
   %spec = (
     export    => [ 'foo', 'bar' ],  # exported automatically
