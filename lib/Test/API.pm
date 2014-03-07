@@ -8,7 +8,8 @@ package Test::API;
 
 use Symbol ();
 
-use superclass 'Test::Builder::Module' => 0.86;
+use Test::Builder::Module 0.86;
+our @ISA    = qw/Test::Builder::Module/;
 our @EXPORT = qw/public_ok import_ok class_api_ok/;
 
 #--------------------------------------------------------------------------#
@@ -150,8 +151,7 @@ sub _public_fcns {
     no strict qw(refs);
     return grep { substr( $_, 0, 1 ) ne '_' }
       map { ( my $f = $_ ) =~ s/^\*$package\:://; $f }
-      grep { defined(*$_{CODE}) }
-      values(%{"$package\::"});
+      grep { defined( *$_{CODE} ) } values( %{"$package\::"} );
 }
 
 #--------------------------------------------------------------------------#

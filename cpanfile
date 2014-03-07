@@ -2,7 +2,6 @@ requires "Symbol" => "0";
 requires "Test::Builder::Module" => "0.86";
 requires "perl" => "5.006";
 requires "strict" => "0";
-requires "superclass" => "0";
 requires "warnings" => "0";
 
 on 'test' => sub {
