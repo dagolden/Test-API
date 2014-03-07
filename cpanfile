@@ -1,4 +1,3 @@
-requires "Devel::Symdump" => "2.08";
 requires "Symbol" => "0";
 requires "Test::Builder::Module" => "0.86";
 requires "perl" => "5.006";
