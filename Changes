@@ -2,6 +2,8 @@ Revision history for Test-API
 
 {{$NEXT}}
 
+0.004     2014-03-14 11:43:54+01:00 Europe/Paris
+
     [ADDED]
 
     - class_api_ok function tests methods, which may be provided the
