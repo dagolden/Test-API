@@ -146,10 +146,31 @@ sub _difference {
 
 #--------------------------------------------------------------------------#
 
+# list adapted from Pod::Coverage
+my %private = map { ; $_ => 1 } qw(
+  import unimport bootstrap
+
+  AUTOLOAD BUILD BUILDARGS CLONE CLONE_SKIP DESTROY DEMOLISH meta
+
+  TIESCALAR TIEARRAY TIEHASH TIEHANDLE
+
+  FETCH STORE UNTIE FETCHSIZE STORESIZE POP PUSH SHIFT UNSHIFT SPLICE
+  DELETE EXISTS EXTEND CLEAR FIRSTKEY NEXTKEY PRINT PRINTF WRITE
+  READLINE GETC READ CLOSE BINMODE OPEN EOF FILENO SEEK TELL SCALAR
+
+  MODIFY_REF_ATTRIBUTES MODIFY_SCALAR_ATTRIBUTES MODIFY_ARRAY_ATTRIBUTES
+  MODIFY_HASH_ATTRIBUTES MODIFY_CODE_ATTRIBUTES MODIFY_GLOB_ATTRIBUTES
+  MODIFY_FORMAT_ATTRIBUTES MODIFY_IO_ATTRIBUTES
+
+  FETCH_REF_ATTRIBUTES FETCH_SCALAR_ATTRIBUTES FETCH_ARRAY_ATTRIBUTES
+  FETCH_HASH_ATTRIBUTES FETCH_CODE_ATTRIBUTES FETCH_GLOB_ATTRIBUTES
+  FETCH_FORMAT_ATTRIBUTES FETCH_IO_ATTRIBUTES
+);
+
 sub _public_fcns {
     my ($package) = @_;
     no strict qw(refs);
-    return grep { substr( $_, 0, 1 ) ne '_' }
+    return grep { substr( $_, 0, 1 ) ne '_' && !$private{$_} && $_ !~ /^\(/ }
       map { ( my $f = $_ ) =~ s/^\*$package\:://; $f }
       grep { defined( *$_{CODE} ) } values( %{"$package\::"} );
 }
@@ -191,8 +212,28 @@ functions aren't unintentionally included via import.
 
 =head1 USAGE
 
-Note: Subroutines in a package starting with an underscore are ignored.
-Therefore, do not include them in any list of expected subroutines.
+Note: Subroutines starting with an underscore are ignored, as are a number
+of other methods not intended to be called directly by end-users.
+
+  import unimport bootstrap
+
+  AUTOLOAD BUILD BUILDARGS CLONE CLONE_SKIP DESTROY DEMOLISH
+
+  TIESCALAR TIEARRAY TIEHASH TIEHANDLE
+
+  FETCH STORE UNTIE FETCHSIZE STORESIZE POP PUSH SHIFT UNSHIFT SPLICE
+  DELETE EXISTS EXTEND CLEAR FIRSTKEY NEXTKEY PRINT PRINTF WRITE
+  READLINE GETC READ CLOSE BINMODE OPEN EOF FILENO SEEK TELL SCALAR
+
+  MODIFY_REF_ATTRIBUTES MODIFY_SCALAR_ATTRIBUTES MODIFY_ARRAY_ATTRIBUTES
+  MODIFY_HASH_ATTRIBUTES MODIFY_CODE_ATTRIBUTES MODIFY_GLOB_ATTRIBUTES
+  MODIFY_FORMAT_ATTRIBUTES MODIFY_IO_ATTRIBUTES
+
+  FETCH_REF_ATTRIBUTES FETCH_SCALAR_ATTRIBUTES FETCH_ARRAY_ATTRIBUTES
+  FETCH_HASH_ATTRIBUTES FETCH_CODE_ATTRIBUTES FETCH_GLOB_ATTRIBUTES
+  FETCH_FORMAT_ATTRIBUTES FETCH_IO_ATTRIBUTES
+
+Therefore, do not include any of these in a list of expected subroutines.
 
 =head2 public_ok
 

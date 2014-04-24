@@ -2,6 +2,10 @@ Revision history for Test-API
 
 {{$NEXT}}
 
+    [CHANGED]
+
+    - common methods treated as private (e.g. AUTOLOAD, BUILD) are ignored
+
 0.004     2014-03-14 11:43:54+01:00 Europe/Paris
 
     [ADDED]

@@ -6,4 +6,6 @@ our @ISA = qw(t::lib::Parent);
 sub www { 2 }
 sub xxx { 2 }
 
+sub BUILD { 1 }
+
 1;
