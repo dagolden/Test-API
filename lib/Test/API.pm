@@ -5,7 +5,7 @@ use warnings;
 package Test::API;
 # ABSTRACT: Test a list of subroutines provided by a module
 
-our $VERSION = '0.006';
+our $VERSION = '0.008';
 
 use Symbol ();
 
