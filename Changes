@@ -2,6 +2,10 @@ Revision history for Test-API
 
 {{$NEXT}}
 
+    [TESTS]
+
+    - Fixed tests for perls without '.' in @INC
+
 0.005     2014-04-24 11:09:01-04:00 America/New_York
 
     [CHANGED]

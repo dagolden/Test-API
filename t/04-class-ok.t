@@ -6,6 +6,7 @@
 
 use strict;
 use warnings;
+use lib '.';
 
 select STDERR;
 $|++;
@@ -28,13 +29,13 @@ require_ok('t::lib::Child');
 test_out("not ok 1 - public API for class t::lib::Child");
 test_fail(+2);
 test_diag("extra: www");
-class_api_ok('t::lib::Child', qw(xxx yyy zzz));
+class_api_ok( 't::lib::Child', qw(xxx yyy zzz) );
 test_test('class_api_ok - missing method');
 
 test_out("ok 1 - public API for class t::lib::Child");
-class_api_ok('t::lib::Child', qw(www xxx yyy zzz));
+class_api_ok( 't::lib::Child', qw(www xxx yyy zzz) );
 test_test('class_api_ok - complete set of methods');
 
 test_out("ok 1 - public API for class t::lib::Child");
-class_api_ok('t::lib::Child', qw(www xxx yyy));
+class_api_ok( 't::lib::Child', qw(www xxx yyy) );
 test_test('class_api_ok - missing inherited method');
