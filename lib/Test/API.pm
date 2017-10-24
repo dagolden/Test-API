@@ -171,9 +171,17 @@ my %private = map { ; $_ => 1 } qw(
 sub _public_fcns {
     my ($package) = @_;
     no strict qw(refs);
+    my $stash = \%{"$package\::"};
+    my @syms;
+    for (keys %$stash) {
+        push @syms,
+             ref \$stash->{$_} eq 'GLOB'
+               ? \$stash->{$_}
+               : \*{"$package:\:$_"}
+    }
     return grep { substr( $_, 0, 1 ) ne '_' && !$private{$_} && $_ !~ /^\(/ }
-      map { ( my $f = $_ ) =~ s/^\*$package\:://; $f }
-      grep { defined( *$_{CODE} ) } values( %{"$package\::"} );
+      map { ( my $f = *$_ ) =~ s/^\*$package\:://; $f }
+      grep { defined( *$_{CODE} ) } @syms;
 }
 
 #--------------------------------------------------------------------------#
