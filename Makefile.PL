@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::Builder::Tester" => "1.18",
     "Test::More" => 0,
+    "constant" => 0,
     "lib" => 0
   },
   "VERSION" => "0.009",
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "Test::Builder::Module" => "0.86",
   "Test::Builder::Tester" => "1.18",
   "Test::More" => 0,
+  "constant" => 0,
   "lib" => 0,
   "strict" => 0,
   "warnings" => 0
